@@ -1,0 +1,126 @@
+---
+title: "HW03"
+author: "Tim McGinley"
+date: "October 6, 2016"
+output:
+  pdf_document:
+    latex_engine: xelatex
+  html_document: default
+---
+
+
+
+```{r echo = FALSE}
+load("../data/regression.Rdata")
+load("../data/correlation-matrix.Rdata")
+source("../code/functions/regression-functions.R")
+```
+
+###Abstract
+The goal of this homework assignment is to reproduce the primary findings (regression, charts, and tables) on pages 71-82 of **An Introduction to Statistical Learning** by Gareth James, Daniela Witten, Trevor Hastie and Robert Tibshirani.
+
+##Introduction
+Every time a company produces something new, it has a tought decision to make.  See, a new product is useless sitting on the shelves, and the only way people will buy it is if they hear about it through word of mouth or, more commonly, advertising.  So the question is, how much should a company invest in the advertising for one of their products? This report compares the sales figures for various markets for a single product to their market's TV, radio, and newspaper advertising budget and searches for a connection via a multiple linear regression fit. 
+
+##Data
+The data, located in a file called `Advertising.csv`, contains information about the televison, radio, and newspaper advertising budgets and corresponding sales figures.  The entries for the television budgets are in thousands of dollars, while the figures for sales are in thousands of units sold. Overall, 200 markets are represented, and all 200 have extant information for the three different budgets and total sales. 
+
+##Methodology
+To conduct the analysis, first the data was loaded from `Advertising.csv` and the variables of interest ("TV" for TV ad budget, "Radio" and "Newspaper" similarly. "Sales" for units sold) were summarised. Summaries can be found in 
+`hw03/data/eda-output.txt`, and histograms of all variables can be can be found in `hw03/images/`.  
+
+To better understand how the three budget variables might relate to the sales figures for a location, I performed a multiple linear regression analysis with the data.  The general idea is that we imagine changes in explanatory variables—in this case ad budgets—begets changes in another variable, here sales figures. These are called the independent and dependent variables, respectively.  
+
+In a multiple linear regression, we assume that this relationship can be described roughly by the equation $S = \beta_0+\beta_1(TV)+\beta_2(Radio)+\beta_3(Newspaper)$, where $\beta_x$ are random variables determined from the data by a least-squares fit. The function `lm()` determines these variables from the data for us, and this information as well as a summary are located in `hw03/data/regression.Rdata`.  Scatterplots were constructed using `plot()` and `abline()`. 
+
+
+##Results
+
+###Simple Linear Regression Results
+
+Our linear regression analysis produced the results that appear in the following table.  The entries in the table and the paragraph thereafter are inline code and will autogenerate if a different `Advertising.csv` is chosen. 
+
+|  |Estimate|Std.Error|t-value|Pr(>ItI)|
+|:---:|:---:|:---:|:---:|:---:|
+|**(Intercept)**|$`r reg_sum1[[4]][1]`$|$`r reg_sum1[[4]][3]`$|$`r reg_sum1[[4]][5]`$|$`r reg_sum1[[4]][7]`$|
+|**TV ($\beta_t$)**|$`r reg_sum1[[4]][2]`$|$`r reg_sum1[[4]][4]`$|$`r reg_sum1[[4]][6]`$|$`r reg_sum1[[4]][8]`$|
+
+Table: ***Simple Regression of Sales on TV***
+
+![](../images/scatterplot-tv-sales.png)
+
+
+|  |Estimate|Std.Error|t-value|Pr(>ItI)|
+|:---:|:---:|:---:|:---:|:---:|
+|**(Intercept)**|$`r reg_sum2[[4]][1]`$|$`r reg_sum2[[4]][3]`$|$`r reg_sum2[[4]][5]`$|$`r reg_sum2[[4]][7]`$|
+|**TV ($\beta_r$)**|$`r reg_sum2[[4]][2]`$|$`r reg_sum2[[4]][4]`$|$`r reg_sum2[[4]][6]`$|$`r reg_sum2[[4]][8]`$|
+
+Table: ***Simple Regression of Sales on Radio***
+
+![](../images/scatterplot-radio-sales.png)
+
+|  |Estimate|Std.Error|t-value|Pr(>ItI)|
+|:---:|:---:|:---:|:---:|:---:|
+|**(Intercept)**|$`r reg_sum3[[4]][1]`$|$`r reg_sum3[[4]][3]`$|$`r reg_sum3[[4]][5]`$|$`r reg_sum3[[4]][7]`$|
+|**TV ($\beta_n$)**|$`r reg_sum3[[4]][2]`$|$`r reg_sum3[[4]][4]`$|$`r reg_sum3[[4]][6]`$|$`r reg_sum3[[4]][8]`$|
+
+Table: ***Simple Regression of Sales on Newspaper***
+
+![](../images/scatterplot-newspaper-sales.png)
+
+This analysis shows that, using this model, each thousand dollars spent on TV advertising for a product increases that product's sales by about `r round((reg_sum1[[4]][2])*(1000), 1)` units.  It also implies that spending zero dollars on advertising results in sales of around `r round((reg_sum1[[4]][1])*(1000), 0)` units, which is fairly suspect when one looks at the scatterplot of the dependent and independent variables against one another (The regression line is drawn in teal).  THis pattern continues for Radio and Newspaper ads as well. 
+
+
+
+This shows that in practice, markets with small ad budgets do not have sales as high as the intercept of the linear model would suggest.  In general, this is a shortcoming of linear models:  any curvature to the data at all and the relationship becomes less reliable.  One can gleam some idea of how good a linear fit is at representing a relationship in data by calculating the following statistics about the fit.
+
+###Multiple Linear Regression
+
+One can improve the estimating power of the prediction by incorporating more data into the model.  In a multiple linear regression, more than one explanatory variable is used to predict the behavior of the dependent variable.  Here's the coefficient matrix for a multiple linear regression of sales on tv, radio, and newspaper advertising.
+
+|  |Estimate|Std.Error|t-value|Pr(>ItI)|
+|:---:|:---:|:---:|:---:|:---:|
+|**(Intercept)**|$`r reg_sum[[4]][1]`$|$`r reg_sum[[4]][5]`$|$`r reg_sum[[4]][9]`$|$`r reg_sum[[4]][13]`$|
+|**TV ($\beta_t$)**|$`r reg_sum[[4]][2]`$|$`r reg_sum[[4]][6]`$|$`r reg_sum[[4]][10]`$|$`r reg_sum[[4]][14]`$|
+|**Radio ($\beta_r$)**|$`r reg_sum[[4]][3]`$|$`r reg_sum[[4]][7]`$|$`r reg_sum[[4]][11]`$|$`r reg_sum[[4]][15]`$|
+|**Newspaper ($\beta_n$)**|$`r reg_sum[[4]][4]`$|$`r reg_sum[[4]][8]`$|$`r reg_sum[[4]][12]`$|$`r reg_sum[[4]][16]`$|
+
+Table: ***Multiple Regression of Sales on TV, Radio & Newspaper***
+
+![](../images/normal-qq-plot.png)
+
+![](../images/scale-location-plot.png)
+
+![](../images/residual-plot.png)
+
+More information about how these variables are related can be found by looking at their pairwaise correlations, collected below in matrix form. A correlation of 1 suggests one variable is a perfect linear predictor of another and here only occurs with identical variables.
+
+
+Table: ***Correlation Matrix***
+```{r echo=FALSE}
+print(cor_matrix)
+```
+
+
+
+|**Statistic**|**Value**|
+|:---:|:---:|
+|**Residual Standard Error**|`r residual_std_error(reg_obj)`|
+|**$R^2$**| `r r_squared(reg_obj)`|
+|**F-stat**| `r f_statistic(reg_obj)`|
+
+Table: ***Goodness of Fit Statistics***
+
+Residual sum of squares, or *RSS*, is a statistic computed using the forumula $RSS = \sum_{i=1}^n (y_i - f(x_i))^2$, where the $y_i$ values are the true value of the sales for a given markey while the $f(x_i)$ values are the expected sales based on the TV ad budget according to our model.  The least-squares fit is the fit that finds $\beta_0$ and $\beta_1$ so as to make the RSS as small as possible. 
+
+Residual Standard error or *RSE* is a statistic computed using the formula $RSE = \sqrt{\frac{RSS}{(n - 2)}}$ where $n$ is the number of observations to predict. 
+
+The $R^2$ statistic is a measure of how closely the data falls along the regression line.  If all data points were perfectly along this line, $R^2 = 1$.  Instead, we have $R^2 = `r reg_sum['r.squared']`$
+
+The F-statistic displayed above is the ratio $\frac{(TSS - RSS)/p}{RSS/(n - p - 1)}$, and could be used if desired to asses goodness of fit using an F-test. $TSS$ in this case is the total sum of squares, or $\sum_{i = 1} (y_i - \bar{y})^2$.  $n$ remains the number of observations to predict, and $p$ in this case is the number of variables doing the predicting.   This F statistic can be used in an F-test to assess goodness of fit for the model.
+
+
+
+##Conclusions
+
+Clearly, the linear regression model fits this data well, but certainly not perfectly. An $R^2$ value of `r r_squared(reg_obj)` means the line fits the data reasonably well as $`r r_squared(reg_obj)` > 0.5$.  This means that for the majority of markets, increasing the TV ad budget for a product by $1000 will result in an increase in sales of about `r round((r_squared(reg_obj)*1000), 1)` units. 
